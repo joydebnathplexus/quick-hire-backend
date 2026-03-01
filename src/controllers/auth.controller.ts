@@ -47,12 +47,13 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
 
     if (user && (await (user as any).matchPassword(password))) {
-      generateToken(res, user._id.toString(), user.role);
+      const token = generateToken(res, user._id.toString(), user.role);
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        token: token
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -71,6 +72,7 @@ export const logoutUser = (req: Request, res: Response) => {
     secure: true,
     sameSite: 'none',
     expires: new Date(0),
+    path: '/'
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
